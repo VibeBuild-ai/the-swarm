@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibe Build | Swarm Remote Control</title>
+    <title>Vibe Build | Swarm Intelligence Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -13,8 +13,6 @@
         .glass-panel { background: var(--glass-bg); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); border-radius: 16px; }
         .nav-item { cursor: pointer; transition: all 0.2s ease; color: #64748b; }
         .nav-item.active { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border-right: 3px solid #3b82f6; }
-        .preset-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.04); transition: all 0.2s ease; border-radius: 12px; }
-        .preset-btn:hover { background: rgba(255, 255, 255, 0.06); transform: translateX(4px); }
         .log-container::-webkit-scrollbar { width: 6px; }
         .log-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -28,78 +26,56 @@
         <div class="p-8">
             <div class="flex items-center space-x-3 mb-10">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-fuchsia-600 rounded-lg flex items-center justify-center font-bold text-white shadow-xl">VB</div>
-                <span class="font-display font-bold text-xl tracking-tighter uppercase tracking-widest text-blue-400">REMOTE</span>
+                <span class="font-display font-bold text-xl tracking-tighter uppercase tracking-widest text-blue-400">COMMANDER</span>
             </div>
             
             <nav class="space-y-6">
-                <div>
-                    <div onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active p-4 rounded-xl flex items-center mb-1 text-xs uppercase font-bold tracking-[0.2em]">
-                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                        Command Center
-                    </div>
-                    <div onclick="switchView('gallery')" id="nav-gallery" class="nav-item p-4 rounded-xl flex items-center mb-1 text-xs uppercase font-bold tracking-[0.2em]">
-                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        Gallery
-                    </div>
-                    <div onclick="switchView('connector')" id="nav-connector" class="nav-item p-4 rounded-xl flex items-center mb-1 text-xs uppercase font-bold tracking-[0.2em]">
-                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 11-2 0v-1a1 1 0 00-1-1H9a1 1 0 01-1-1v-3a1 1 0 011-1h1a2 2 0 100-4H9a1 1 0 01-1-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
-                        Connector
-                    </div>
+                <div onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active p-4 rounded-xl flex items-center mb-1 text-xs uppercase font-bold tracking-[0.2em]">
+                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    Terminal
                 </div>
-
-                <div>
-                    <p class="text-[10px] uppercase font-bold text-slate-500 mb-4 tracking-[0.15em]">Spezialisten Presets</p>
-                    <div class="space-y-3">
-                        <button onclick="setPrompt('researcher')" class="preset-btn w-full p-4 text-left flex flex-col">
-                            <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Researcher Call</span>
-                            <span class="text-[9px] text-slate-600 italic">Deep Web Intelligence Scan</span>
-                        </button>
-                        <button onclick="setPrompt('auditor')" class="preset-btn w-full p-4 text-left flex flex-col">
-                            <span class="text-[10px] font-black text-fuchsia-400 uppercase tracking-widest mb-1">Code Auditor</span>
-                            <span class="text-[9px] text-slate-600 italic">Architecture & Vulnerability</span>
-                        </button>
-                    </div>
+                <div onclick="switchView('connector')" id="nav-connector" class="nav-item p-4 rounded-xl flex items-center mb-1 text-xs uppercase font-bold tracking-[0.2em]">
+                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 11-2 0v-1a1 1 0 00-1-1H9a1 1 0 01-1-1v-3a1 1 0 011-1h1a2 2 0 100-4H9a1 1 0 01-1-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+                    Authority Bridge
                 </div>
             </nav>
         </div>
         <div class="mt-auto p-8 border-t border-white/5 bg-black/20">
-             <div class="text-[10px] text-slate-600 uppercase font-black tracking-widest mb-1">Engine Status</div>
-             <div id="engine-status" class="text-xs font-mono text-slate-500">OFFLINE - Waiting for Token</div>
+             <div class="text-[10px] text-slate-600 uppercase font-black tracking-widest mb-1">Nexus Status</div>
+             <div id="engine-status" class="text-xs font-mono text-red-500 uppercase">Disconnected</div>
         </div>
     </aside>
 
     <!-- CONTENT -->
     <main class="flex-1 flex flex-col overflow-hidden">
-        
         <header class="h-20 border-b border-white/5 px-10 flex items-center justify-between bg-black/40">
             <h2 id="view-title" class="font-display font-medium text-slate-400 text-xs tracking-[0.3em] uppercase">Swarm Dashboard</h2>
-            <div id="active-project-badge" class="text-[9px] font-mono text-slate-700 uppercase tracking-widest border border-white/10 px-4 py-2 rounded-full">NO PROJECT LINKED</div>
+            <div id="active-project-badge" class="text-[9px] font-mono text-slate-700 uppercase tracking-widest border border-white/10 px-4 py-2 rounded-full italic">Unauthorized</div>
         </header>
 
-        <!-- DASHBOARD VIEW -->
+        <!-- TERMINAL VIEW -->
         <div id="view-dashboard" class="flex flex-col flex-1 p-10 space-y-10 overflow-y-auto view-animate">
+            <!-- INPUT UNIT -->
             <div class="glass-panel p-2 shadow-2xl transition-all border-blue-500/10">
                 <textarea id="commandInput" placeholder="CMD: Welches Intelligenz-Asset soll der Schwarm generieren?" 
                           class="w-full h-44 bg-transparent p-8 text-slate-100 text-lg font-light outline-none resize-none placeholder-slate-800"></textarea>
                 
                 <div class="flex items-center justify-between p-4 bg-black/40 rounded-b-xl border-t border-white/5">
-                    <div class="flex space-x-2">
-                         <div id="auth-status" class="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-[9px] font-bold text-red-400 uppercase">Unauthorized</div>
-                    </div>
+                    <div id="auth-status" class="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-[9px] font-bold text-red-400 uppercase">Authority Required</div>
                     <button onclick="dispatchSwarm()" id="dispatchBtn"
                             class="bg-blue-600 hover:bg-blue-500 text-white font-black py-4 px-12 rounded-xl shadow-2xl active:scale-95 transition-all uppercase tracking-widest text-xs">
-                        SCHWARM AUSSENDEN
+                        DISPATCH SIGNAL
                     </button>
                 </div>
             </div>
 
+            <!-- OUTPUT UNIT -->
             <div class="glass-panel flex-1 flex flex-col overflow-hidden bg-black/60 border-white/5 shadow-2xl">
                 <div class="px-8 py-4 bg-black/40 border-b border-white/5 flex items-center justify-between">
-                     <span class="font-mono text-[9px] text-slate-600 uppercase tracking-widest">Live Execution Stream | Google Vertex AI ADK</span>
-                     <div class="flex space-x-2"><div class="w-2 h-2 rounded-full bg-slate-800"></div><div class="w-2 h-2 rounded-full bg-slate-800"></div></div>
+                     <span class="font-mono text-[9px] text-slate-600 uppercase tracking-widest animate-pulse">Live Cloud Nexus | Google AI Engine</span>
                 </div>
                 <div id="log-terminal" class="flex-1 p-10 font-mono text-[11px] overflow-y-auto log-container space-y-4 leading-relaxed">
-                    <div class="text-slate-800 uppercase text-center py-24 font-black tracking-[0.5em] opacity-40">Awaiting Signal</div>
+                    <div class="text-slate-800 uppercase text-center py-24 font-black tracking-[0.5em] opacity-40 italic">Awaiting Authority Link...</div>
                 </div>
             </div>
         </div>
@@ -108,61 +84,37 @@
         <div id="view-connector" class="hidden flex-1 flex items-center justify-center p-12 overflow-y-auto view-animate">
             <div class="w-full max-w-xl glass-panel p-12 border-t-2 border-blue-600 shadow-2xl">
                 <div class="text-center mb-10">
-                    <h3 class="text-3xl font-display font-black text-white uppercase tracking-widest">Authority Bridge</h3>
-                    <p class="text-slate-500 text-xs mt-2 italic font-mono uppercase">Verbinde dein Dashboard mit deiner eigenen Google Cloud</p>
+                    <h3 class="text-3xl font-display font-black text-white uppercase tracking-widest">Cloud Nexus</h3>
+                    <p class="text-slate-500 text-[10px] mt-2 font-mono uppercase">Verknüpfen Sie dieses Dashboard mit Ihrer Google Cloud</p>
                 </div>
                 <div class="space-y-6">
-                    <div>
-                        <label class="block text-[9px] uppercase font-bold text-slate-600 mb-3 tracking-widest">Project ID</label>
-                        <input type="text" id="projectId" placeholder="google-cloud-project-id" class="w-full bg-black/60 border border-white/5 rounded-2xl p-5 text-blue-400 font-mono text-sm focus:border-blue-500 outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] uppercase font-bold text-slate-600 mb-3 tracking-widest">Location</label>
-                        <input type="text" id="location" value="us-central1" class="w-full bg-black/60 border border-white/5 rounded-2xl p-5 text-slate-400 font-mono text-sm focus:border-blue-500 outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] uppercase font-bold text-slate-600 mb-3 tracking-widest">Agent ID</label>
-                        <input type="text" id="agentId" placeholder="der_schwarm_engine" class="w-full bg-black/60 border border-white/5 rounded-2xl p-5 text-fuchsia-400 font-mono text-sm focus:border-fuchsia-500 outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] uppercase font-bold text-slate-600 mb-3 tracking-widest">Google Auth Token (ya29...)</label>
-                        <input type="password" id="accessToken" placeholder="Paste: gcloud auth print-access-token" class="w-full bg-black/60 border border-white/5 rounded-2xl p-5 text-fuchsia-400 font-mono text-sm focus:border-fuchsia-500 outline-none transition-all">
-                        <div class="mt-4 p-4 bg-blue-500/5 border border-blue-500/10 rounded-xl">
-                            <p class="text-[9px] text-blue-400 uppercase font-black mb-1">Für Zuschauer: So bekommst du deinen Key</p>
-                            <p class="text-[9px] text-slate-500 font-mono italic">Tippe in dein Terminal: <span class="text-blue-300">gcloud auth print-access-token</span></p>
-                            <a href="https://console.cloud.google.com/" target="_blank" class="text-[8px] text-slate-600 underline uppercase mt-2 block hover:text-white">Google Cloud Console öffnen ↗</a>
-                        </div>
-                    </div>
-                    <button onclick="saveConnectorData()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl uppercase tracking-widest text-xs transition-all shadow-xl shadow-blue-600/10 active:scale-95">
-                        SAVE AUTHORITY SECRETS
+                    <input type="text" id="projectId" placeholder="Project ID" class="w-full bg-black/60 border border-white/5 rounded-2xl p-5 text-blue-400 font-mono text-sm focus:border-blue-500 outline-none transition-all">
+                    <input type="text" id="location" value="us-central1" class="w-full bg-black/60 border border-white/5 rounded-2xl p-5 text-slate-400 font-mono text-sm focus:border-blue-500 outline-none transition-all">
+                    <input type="text" id="agentId" placeholder="Agent Engine ID (z.B. der_schwarm)" class="w-full bg-black/60 border border-white/5 rounded-2xl p-5 text-fuchsia-400 font-mono text-sm focus:border-fuchsia-500 outline-none transition-all">
+                    <input type="password" id="accessToken" placeholder="Google Auth Token (ya29...)" class="w-full bg-black/60 border border-white/5 rounded-2xl p-5 text-fuchsia-400 font-mono text-sm focus:border-fuchsia-500 outline-none transition-all">
+                    
+                    <button onclick="saveConnectorData()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
+                        LINK PROJECT & START
                     </button>
-                    <p class="text-[9px] text-slate-600 text-center uppercase tracking-tighter">Ihre Geheimnisse werden nur lokal in Ihrem Browser gespeichert.</p>
+                    <p class="text-[8px] text-slate-600 text-center uppercase tracking-widest">Geheimnisse werden nur lokal gespeichert.</p>
                 </div>
             </div>
         </div>
-
-        <div id="view-gallery" class="hidden flex-1 p-12 overflow-y-auto view-animate">
-            <h2 class="text-4xl font-display font-black text-white tracking-widest uppercase mb-12">Intelligence Grid</h2>
-            <div id="artifactGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <div id="empty-state" class="col-span-full text-center py-40 border-2 border-dashed border-white/5 rounded-3xl opacity-20">Awaiting Assets</div>
-            </div>
-        </div>
-
     </main>
 
     <script>
         const terminal = document.getElementById('log-terminal');
         const input = document.getElementById('commandInput');
         const btn = document.getElementById('dispatchBtn');
-        const grid = document.getElementById('artifactGrid');
 
-        // LOCAL STORAGE STORAGE
         let auth = {
             projectId: localStorage.getItem('projectId') || '',
             accessToken: localStorage.getItem('accessToken') || '',
             location: localStorage.getItem('location') || 'us-central1',
-            agentId: localStorage.getItem('agentId') || 'der_schwarm'
+            agentId: localStorage.getItem('agentId') || ''
         };
+
+        let lastAgentResponse = "";
 
         function saveConnectorData() {
             auth.projectId = document.getElementById('projectId').value;
@@ -171,7 +123,6 @@
             auth.agentId = document.getElementById('agentId').value;
             Object.keys(auth).forEach(k => localStorage.setItem(k, auth[k]));
             updateUiStatus();
-            alert("Authority Bridge established. Cloud Nexus Active.");
             switchView('dashboard');
         }
 
@@ -180,147 +131,85 @@
             const badge = document.getElementById('active-project-badge');
             const engine = document.getElementById('engine-status');
             if (auth.accessToken && auth.projectId) {
-                status.innerText = "AUTHENTICATED"; status.className = "px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[9px] font-bold text-green-500 uppercase";
-                badge.innerText = `PROJECT: ${auth.projectId}`; badge.classList.add('text-blue-400');
-                engine.innerText = "NEXUS ONLINE - Ready to Dispatch"; engine.classList.add('text-green-500');
+                status.innerText = "NEXUS ACTIVE"; status.className = "px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[9px] font-bold text-green-500 uppercase";
+                badge.innerText = `LINKED: ${auth.projectId}`; badge.classList.add('text-blue-400');
+                engine.innerText = "Operational"; engine.className = "text-xs font-mono text-green-500 uppercase";
                 document.getElementById('projectId').value = auth.projectId;
                 document.getElementById('accessToken').value = auth.accessToken;
-                document.getElementById('location').value = auth.location;
                 document.getElementById('agentId').value = auth.agentId;
             }
         }
         updateUiStatus();
 
         function switchView(view) {
-            ['dashboard', 'gallery', 'connector'].forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                el.classList.toggle('hidden', v !== view);
-                el.classList.toggle('flex', v === view && (v === 'dashboard' || v === 'connector'));
+            ['dashboard', 'connector'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.toggle('hidden', v !== view);
                 document.getElementById(`nav-${v}`).classList.toggle('active', v === view);
             });
-            document.getElementById('view-title').innerText = view.toUpperCase() + ' // AUTHORITY UNIT';
+            document.getElementById('view-title').innerText = "VIBE BUILD // " + view.toUpperCase();
         }
 
         function addLog(msg, type) {
             const div = document.createElement('div');
             const time = new Date().toLocaleTimeString();
-            let color = type === 'success' ? 'text-green-400' : (type === 'agent' ? 'text-blue-400 font-bold' : (type === 'error' ? 'text-red-500' : 'text-slate-600'));
+            let color = type === 'success' ? 'text-green-400' : (type === 'agent' ? 'text-blue-400 font-bold' : (type === 'error' ? 'text-red-500 font-black' : 'text-slate-600'));
             div.className = `flex ${color}`;
-            div.innerHTML = `<span class="mr-6 opacity-20 font-mono text-[9px]">${time}</span> <span>${msg}</span>`;
-            if (terminal.innerText.includes('Awaiting Signal')) terminal.innerHTML = '';
+            div.innerHTML = `<span class="mr-6 opacity-20 font-mono text-[9px] tabular-nums">${time}</span> <span class="flex-1">${msg}</span>`;
+            if (terminal.innerText.includes('Awaiting')) terminal.innerHTML = '';
             terminal.appendChild(div);
             terminal.scrollTop = terminal.scrollHeight;
         }
 
         async function dispatchSwarm() {
             const prompt = input.value;
-            if(!prompt) return alert("System-Fehler: Kommando-Input erforderlich.");
+            if(!prompt) return alert("Befehl erforderlich.");
             
-            if (!auth.accessToken || !auth.projectId) {
-                addLog('CRITICAL_ERROR: Kein Cloud-Nexus aktiv. Bitte Connector hintelegen.', 'error');
-                switchView('connector');
-                return;
+            if (!auth.accessToken || !auth.projectId || !auth.agentId) {
+                addLog('CRITICAL_FAILURE: Missing Cloud Credentials in Connector.', 'error');
+                switchView('connector'); return;
             }
 
             btn.disabled = true;
             terminal.innerHTML = '';
-            addLog(`INITIALIZING GLOBAL DISPATCH... Project: ${auth.projectId}`, 'success');
-            await sleep(1000);
-            addLog(`ESTABLISHING LINK to Agent '${auth.agentId}'...`, 'agent');
+            addLog(`SIGNAL_DISPATCH: Broadcasting to Google Vertex AI Nexus...`, 'success');
 
             try {
                 const endpoint = `https://${auth.location}-aiplatform.googleapis.com/v1/projects/${auth.projectId}/locations/${auth.location}/agents/${auth.agentId}:run`;
                 
-                addLog(`CALLING_VERTEX_AI: Sending prompt to orchestration engine...`, 'info');
-                
-                // DAS IST DER ECHTE API CALL FÜR DEINE ZUSCHAUER
                 const response = await fetch(endpoint, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${auth.accessToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        input: { content: prompt }
-                    })
+                    headers: { 'Authorization': `Bearer ${auth.accessToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ input: { content: prompt } })
                 });
 
                 if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.error?.message || 'API Communication failed');
+                    const err = await response.json();
+                    throw new Error(err.error?.message || 'Nexus Timeout');
                 }
 
                 const data = await response.json();
-                addLog('DATA_RECEIVED: Synchronisierung abgeschlossen.', 'success');
+                lastAgentResponse = data.output?.content || 'No detailed data received.';
                 
-                // EXTRAKTION DER ANTWORT VOM ECHTEN AGENTEN
-                const agentResponse = data.output?.content || 'Mission erfolgreich, aber kein Text-Output erhalten.';
-                addLog(`SCHWARM_OUTPUT: ${agentResponse}`, 'agent');
+                addLog('NEXUS_SYNC_COMPLETE: Receiving Intelligence Stream...', 'success');
+                addLog(`AGENT_OUTPUT: ${lastAgentResponse}`, 'agent');
+                
+                const dl = `<a href="#" onclick="downloadRealAsset(); return false;" class="underline text-fuchsia-400 font-bold ml-2 transition-all hover:text-white uppercase">[Export Asset]</a>`;
+                addLog(`MISSION_SUCCESS: Artifact ready for secure download. ${dl}`, 'success');
 
             } catch(e) {
-                addLog(`BRIDGE_FAILURE: ${e.message}`, 'error');
-                addLog('TIPP: Prüfen Sie Ihren Token (gcloud auth print-access-token).', 'info');
+                addLog(`NEXUS_LINK_BROKEN: ${e.message}`, 'error');
+                addLog('TIPP: Erneuern Sie Ihren Token (gcloud auth print-access-token).', 'info');
             } finally {
                 btn.disabled = false;
-                addLog('SWARM-MODE: Mission Complete. Hibernate Status: ON.', 'info');
-                createArtifactCard();
             }
         }
 
-        async function performSimulationProcess() {
-            await sleep(1500);
-            addLog('COMMANDER @ Unit_Researcher (ADK): Deep search start...', 'agent'); await sleep(2500);
-            addLog('RESEARCH_OUTPUT: Found 3 relevant data clusters. Streaming to Auditor.', 'success'); await sleep(1500);
-            addLog('COMMANDER @ Unit_Auditor (ADK): Validating security...', 'agent'); await sleep(2000);
-            addLog('AUDIT_PASS: Compliance confirmed. No risks detected.', 'success'); await sleep(1200);
-            addLog('COMMANDER @ Unit_Analyst (ADK): Final synthesis...', 'agent'); await sleep(1500);
-            
-            const link = `<a href="#" onclick="startRealDownload(); return false;" class="underline text-fuchsia-400 font-bold ml-2">[DOWNLOAD ASSET]</a>`;
-            addLog(`MISSION COMPLETE: Asset ready for secure export. ${link}`, 'success');
-            createArtifactCard();
-        }
-
-        function createArtifactCard() {
-            const st = document.getElementById('empty-state'); if(st) st.classList.add('hidden');
-            const card = document.createElement('div');
-            card.className = 'glass-panel p-8 flex flex-col items-center animate-bounce';
-            card.innerHTML = `<div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6"><svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><button onclick="startRealDownload()" class="w-full bg-blue-600 text-[10px] font-bold py-3 rounded uppercase">Download Artifact</button>`;
-            grid.appendChild(card);
-            setTimeout(() => card.classList.remove('animate-bounce'), 1000);
-        }
-
-        function startRealDownload() {
-            const reportContent = `# 🐝 VIBE BUILD | SWARM INTELLIGENCE ASSET\n` +
-                                `Mission Designation: ALPHA-STRIKE-2026\n` +
-                                `Orchestration Engine: Google Vertex AI (ADK)\n` +
-                                `Timestamp: ${new Date().toLocaleString()}\n\n` +
-                                `--- \n\n` +
-                                `### 🔍 PHASE 1: DATA HARVESTING (@Unit_Researcher)\n` +
-                                `- **Global SOTA Discovery**: Deep-Scan im Bereich Multi-Agent-Orchestration abgeschlossen.\n` +
-                                `- **Trend Synthesis**: Signifikante Zunahme von Agentic-Workflows in Enterprise-Umgebungen festgestellt.\n` +
-                                `- **Contextual Mapping**: Vibe Build Nexus-Architektur als Benchmark identifiziert.\n\n` +
-                                `### 🛡️ PHASE 2: SECURITY COMPLIANCE (@Unit_Auditor)\n` +
-                                `- **Infrastructure Audit**: 0 kritische Schwachstellen in der ADK-Bridge gefunden.\n` +
-                                `- **Safety Protocols**: Google Guardrails v4.2 aktiv und fehlerfrei.\n` +
-                                `- **Latency Check**: 0.8ms Roundtrip-Response im Cloud-Nexus.\n\n` +
-                                `### ✍️ PHASE 3: MISSION SUMMARY (@Unit_Analyst)\n` +
-                                `Der Schwarm hat die Mission erfolgreich abgeschlossen. Alle Intelligence-Knoten sind synchronisiert. Das System wird nun in den Hibernate-Modus versetzt.\n\n` +
-                                `--- \n` +
-                                `[AUTHORITY GRANTED: VIBE BUILD COMMANDER]`;
-            
-            const blob = new Blob([reportContent], { type: 'text/markdown' });
+        function downloadRealAsset() {
+            const blob = new Blob([`VIBE BUILD | INTELLIGENCE ASSET\n\nCommand: ${input.value}\n\nResult:\n${lastAgentResponse}`], { type: 'text/markdown' });
             const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'VibeBuild_Intelligence_Asset.md';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            const a = document.createElement('a'); a.href = url; a.download = 'VibeBuild_Agent_Output.md';
+            document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url);
         }
-
-        function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-        function setPrompt(key) { input.value = key === 'researcher' ? "Deep Web Intelligence Scan für KI-Video-Trends 2026." : "Führe einen Full-Security Audit auf Repository X durch."; input.focus(); }
     </script>
 </body>
 </html>
