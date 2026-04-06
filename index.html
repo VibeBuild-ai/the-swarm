@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vibe Build | Swarm Intelligence Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.24/jsrsasign-all-min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root { --bg-obsidian: #0a0c10; --glass-bg: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.08); }
@@ -106,7 +107,7 @@
                 <div class="space-y-6">
                     <div>
                         <label class="text-[9px] uppercase font-bold text-slate-500 tracking-widest block mb-2">Nexus Authority (JSON)</label>
-                        <textarea id="jsonInput" placeholder="Paste full Service Account JSON content here..." 
+                        <textarea id="jsonInput" oninput="extractJsonData()" placeholder="Paste full Service Account JSON content here..." 
                                   class="w-full h-48 bg-black/60 border border-white/5 rounded-2xl p-6 text-blue-400 font-mono text-[10px] focus:border-blue-500 outline-none transition-all resize-none shadow-inner"></textarea>
                     </div>
 
@@ -124,7 +125,6 @@
                     <div>
                         <label class="text-[8px] uppercase text-slate-700 font-bold ml-1">Private VPS Proxy (Optional)</label>
                         <input type="text" id="vpsProxy" placeholder="z.B. http://YOUR_VPS_IP:5005" class="w-full bg-black/60 border border-white/5 rounded-xl p-4 text-[10px] font-mono text-green-500 focus:border-green-500 outline-none transition-all">
-                        <p class="text-[7px] text-slate-800 uppercase tracking-widest mt-1">Leaves empty to use Public Global Proxy.</p>
                     </div>
                     
                     <button onclick="saveConnectorData()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
@@ -143,19 +143,14 @@
 
         let auth = {
             projectId: localStorage.getItem('projectId') || '',
-            accessToken: localStorage.getItem('accessToken') || '',
+            privateKey: localStorage.getItem('privateKey') || '',
+            clientEmail: localStorage.getItem('clientEmail') || '',
             location: localStorage.getItem('location') || 'us-central1',
-            agentId: localStorage.getItem('agentId') || 'der_schwarm'
+            agentId: localStorage.getItem('agentId') || 'der_schwarm',
+            vpsProxy: localStorage.getItem('vpsProxy') || ''
         };
 
         let lastAgentResponse = "";
-
-        function copyGcloudCmd() {
-            const p = document.getElementById('projectId').value || 'MY_PROJECT_ID';
-            const cmd = `gcloud auth print-access-token --project=${p}`;
-            navigator.clipboard.writeText(cmd);
-            alert("Befehl kopiert! Füge ihn in dein Terminal ein, um den Token zu generieren: " + cmd);
-        }
 
         function extractJsonData() {
             const raw = document.getElementById('jsonInput').value;
@@ -163,15 +158,27 @@
                 const data = JSON.parse(raw);
                 if (data.project_id) {
                     document.getElementById('projectId').value = data.project_id;
+                    auth.projectId = data.project_id;
+                    auth.privateKey = data.private_key;
+                    auth.clientEmail = data.client_email;
                     addLog(`NEXUS: Project '${data.project_id}' erkannt.`, 'success');
                 }
             } catch(e) {}
         }
 
         function saveConnectorData() {
-            auth.projectId = document.getElementById('projectId').value;
-            auth.accessToken = document.getElementById('accessToken').value;
+            const raw = document.getElementById('jsonInput').value;
+            try {
+                const data = JSON.parse(raw);
+                auth.projectId = data.project_id;
+                auth.privateKey = data.private_key;
+                auth.clientEmail = data.client_email;
+            } catch(e) {}
+            
+            auth.projectId = auth.projectId || document.getElementById('projectId').value;
             auth.agentId = document.getElementById('agentId').value;
+            auth.vpsProxy = document.getElementById('vpsProxy').value;
+            
             Object.keys(auth).forEach(k => localStorage.setItem(k, auth[k]));
             updateUiStatus();
             switchView('dashboard');
@@ -181,21 +188,23 @@
             const status = document.getElementById('auth-status');
             const badge = document.getElementById('active-project-badge');
             const engine = document.getElementById('engine-status');
-            if (auth.accessToken && auth.projectId) {
+            if (auth.privateKey && auth.projectId) {
                 status.innerText = "AUTHORITY ACTIVE"; status.className = "px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[9px] font-bold text-green-500 uppercase";
                 badge.innerText = `HUB: ${auth.projectId}`; badge.classList.add('text-blue-400');
                 engine.innerText = "Operational"; engine.className = "text-xs font-mono text-green-500 uppercase";
-                document.getElementById('projectId').value = auth.projectId;
-                document.getElementById('accessToken').value = auth.accessToken;
-                document.getElementById('agentId').value = auth.agentId;
+                if(document.getElementById('projectId')) document.getElementById('projectId').value = auth.projectId;
+                if(document.getElementById('agentId')) document.getElementById('agentId').value = auth.agentId;
+                if(document.getElementById('vpsProxy')) document.getElementById('vpsProxy').value = auth.vpsProxy;
             }
         }
         updateUiStatus();
 
         function switchView(view) {
             ['dashboard', 'connector'].forEach(v => {
-                document.getElementById(`view-${v}`).classList.toggle('hidden', v !== view);
-                document.getElementById(`nav-${v}`).classList.toggle('active', v === view);
+                const el = document.getElementById(`view-${v}`);
+                const nav = document.getElementById(`nav-${v}`);
+                if(el) el.classList.toggle('hidden', v !== view);
+                if(nav) nav.classList.toggle('active', v === view);
             });
             document.getElementById('view-title').innerText = "VIBE BUILD // " + view.toUpperCase();
         }
@@ -227,12 +236,8 @@
                 const jwt = KJUR.jws.JWS.sign("RS256", sHeader, sPayload, auth.privateKey);
 
                 const tokenUrl = "https://oauth2.googleapis.com/token";
-                
-                // DYNAMISCHE PROXY-AUSWAHL
                 let fetchUrl = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(tokenUrl);
-                if (auth.vpsProxy) {
-                    fetchUrl = `${auth.vpsProxy}/nexus_gateway?url=${encodeURIComponent(tokenUrl)}`;
-                }
+                if (auth.vpsProxy) fetchUrl = `${auth.vpsProxy}/nexus_gateway?url=${encodeURIComponent(tokenUrl)}`;
                 
                 const response = await fetch(fetchUrl, {
                     method: "POST",
@@ -240,11 +245,11 @@
                     body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
                 });
                 
-                if (!response.ok) throw new Error("Google Authority Rejected the Request");
+                if (!response.ok) throw new Error("Google Authority Declined Request");
                 const data = await response.json();
                 return data.access_token;
             } catch(e) {
-                throw new Error("AUTHORITY_BRIDGE_FAILURE: " + e.message);
+                throw new Error("BRIDGE_TOKEN_FAILURE: " + e.message);
             }
         }
 
@@ -253,7 +258,7 @@
             if(!prompt) return alert("Befehl erforderlich.");
             
             if (!auth.privateKey || !auth.projectId || !auth.agentId) {
-                addLog('AUTHORITY_ERROR: Please link your Service Account JSON.', 'error');
+                addLog('AUTHORITY_ERROR: Project JSON not linked.', 'error');
                 switchView('connector'); return;
             }
 
@@ -265,12 +270,10 @@
                 const token = await getAccessToken();
                 const endpoint = `https://${auth.location}-aiplatform.googleapis.com/v1/projects/${auth.projectId}/locations/${auth.location}/agents/${auth.agentId}:run`;
                 
-                addLog(`BROADCAST: Sending encrypted signal via ${auth.vpsProxy ? 'Private VPS' : 'Public Nexus Bridge'}...`, 'success');
+                addLog(`BROADCAST: Sending encrypted signal via Nexus...`, 'success');
                 
                 let fetchUrl = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(endpoint);
-                if (auth.vpsProxy) {
-                    fetchUrl = `${auth.vpsProxy}/nexus_gateway?url=${encodeURIComponent(endpoint)}`;
-                }
+                if (auth.vpsProxy) fetchUrl = `${auth.vpsProxy}/nexus_gateway?url=${encodeURIComponent(endpoint)}`;
 
                 const response = await fetch(fetchUrl, {
                     method: 'POST',
@@ -278,9 +281,7 @@
                     body: JSON.stringify({ input: { content: prompt } })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`AGENT_REJECTION: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`AGENT_REJECTION: ${response.status}`);
 
                 const data = await response.json();
                 lastAgentResponse = data.output?.content || 'Mission parameters synchronized.';
