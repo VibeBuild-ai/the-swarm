@@ -238,22 +238,35 @@
 
         async function multiFetch(targetUrl, options) {
             const proxies = [
-                "https://api.codetabs.com/v1/proxy?quest=",
-                "https://thingproxy.freeboard.io/fetch/",
-                "https://corsproxy.io/?"
+                { name: "CodeTabs (Bridge 1)", url: "https://api.codetabs.com/v1/proxy?quest=" },
+                { name: "ThingProxy (Bridge 2)", url: "https://thingproxy.freeboard.io/fetch/" },
+                { name: "CorsProxy.io (Bridge 3)", url: "https://corsproxy.io/?" }
             ];
 
             for (const p of proxies) {
                 try {
-                    const url = p + encodeURIComponent(targetUrl);
-                    const response = await fetch(url, options);
+                    addLog(`BRIDGE: Testing ${p.name}...`, 'success');
+                    const controller = new AbortController();
+                    const id = setTimeout(() => controller.abort(), 8000); // 8s Fast-Fail
+                    
+                    const fetchUrl = p.url + encodeURIComponent(targetUrl);
+                    const response = await fetch(fetchUrl, { ...options, signal: controller.signal });
+                    clearTimeout(id);
+
                     if (response.ok) {
                         const text = await response.text();
-                        try { return JSON.parse(text); } catch(e) { continue; }
+                        try { 
+                            const json = JSON.parse(text); 
+                            addLog(`BRIDGE: ${p.name} connected.`, 'success');
+                            return json; 
+                        } catch(e) { }
                     }
-                } catch(e) { console.warn(`Proxy ${p} failed, trying next...`); }
+                    addLog(`BRIDGE: ${p.name} rejected our signal.`, 'error');
+                } catch(e) { 
+                    addLog(`BRIDGE: ${p.name} offline.`, 'error');
+                }
             }
-            throw new Error("ALL_BRIDGES_BLOCKED: Google Authority ist über öffentliche Proxies gerade nicht erreichbar.");
+            throw new Error("ALL_BRIDGES_FAILED: Nexus currently unreachable.");
         }
 
         async function getAccessToken() {
