@@ -421,11 +421,13 @@
                 let responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Mission parameters synchronized.';
                 addLog(`SWARM TASK COMPLETE. Converting payload to Asset...`, 'agent');
 
-                const assetId = assetPayloads.length;
-                assetPayloads.push({ directive: inputVal, response: responseText });
+                // ATOMIC PUSH to handle parallel race conditions
+                const assetId = assetPayloads.push({ directive: inputVal, response: responseText }) - 1;
+                
+                addLog(`MISSION SUCCESS. ID:${assetId} synchronized. Payload ready for extraction.`, 'success');
 
                 const dl1 = `<a href="#" onclick="generatePDFAsset(${assetId}); return false;" class="underline text-red-500 font-bold ml-2 uppercase hover:text-red-400 transition-colors">[📎 EXTRACT TARGET ASSET]</a>`;
-                addLog(`MISSION SUCCESS. Payload ready for extraction: ${dl1}`, 'success');
+                addLog(`DOCKING [TARGET_${assetId}]: ${dl1}`, 'success');
 
             } catch(e) {
                 addLog(`CRITICAL_FAILURE: ${e.message}`, 'error');
@@ -442,7 +444,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>VibeBuild_Intel_Report</title>
+                    <title>VibeBuild_Intel_Report_${assetId}</title>
                     <style>
                         body { font-family: 'Courier New', monospace; padding: 40px; color: #111; background: #fff; line-height: 1.6; }
                         .header { border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
@@ -478,10 +480,16 @@
                 </html>
             `;
             
-            const printWindow = window.open('', '_blank');
+            const printWindow = window.open('', 'asset_' + assetId + '_' + Date.now());
+            if (!printWindow) {
+                addLog(`CRITICAL ERROR: Popup blocker detected. Please allow popups for this dashboard.`, 'error');
+                return alert("Popup blocker detected! Please allow popups to extract your assets.");
+            }
+            
             printWindow.document.open();
             printWindow.document.write(htmlContent);
             printWindow.document.close();
+            printWindow.focus();
         }
 
         function setPrompt(key) {
