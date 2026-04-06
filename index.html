@@ -349,7 +349,7 @@
                 const token = await getAccessToken();
                 
                 // We map 'the_swarm' to Gemini 2.5 Flash to bypass the 30-second public Proxy timeout 
-                let modelId = auth.agentId === "the_swarm" || auth.agentId === "der_schwarm" ? "gemini-2.5-flash" : auth.agentId;
+                let modelId = auth.agentId === "the_swarm" || auth.agentId === "the_swarm" ? "gemini-2.5-flash" : auth.agentId;
                 if (!modelId.includes("gemini")) modelId = "gemini-2.5-flash"; // Fallback Safenet
 
                 const endpoint = `https://${auth.location}-aiplatform.googleapis.com/v1/projects/${auth.projectId}/locations/${auth.location}/publishers/google/models/${modelId}:generateContent`;

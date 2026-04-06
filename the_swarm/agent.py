@@ -4,8 +4,8 @@ from google.adk import Agent, AgentEngine
 # --------------------------------------------------------------------------------
 # VIBE BUILD | THE SWARM (ALPHABET ADK SHOWCASE)
 # --------------------------------------------------------------------------------
-# This system uses the Google Multi-Agent Orchestration Engine (ADK),
-# um einen hierarchischen Experten-Schwarm für Markt-Analyse & Security zu steuern.
+# This system uses the Google Multi-Agent Orchestration Engine (ADK)
+# to orchestrate a hierarchical expert swarm for Market Analysis & Security.
 # --------------------------------------------------------------------------------
 
 def save_to_desktop(filename: str, content: str) -> str:
@@ -19,16 +19,16 @@ def save_to_desktop(filename: str, content: str) -> str:
     return f"ARTIFACT_SECURED: {file_path}"
 
 def internet_search(query: str) -> str:
-    """Agenten-Tool für dezentrales Data-Harvesting via Google Search API."""
-    return f"DATA_STREAM_RECEIVED für '{query}': [Trending: Agentic Workflows, Vertex AI Scaling, Swarm Intelligence v2]"
+    """Agent tool for decentralized data harvesting via Google Search API."""
+    return f"DATA_STREAM_RECEIVED for '{query}': [Trending: Agentic Workflows, Vertex AI Scaling, Swarm Intelligence v2]"
 
 # 1. THE RESEARCHER (Analytical Spearhead)
 researcher = Agent(
     model="gemini-2.5-flash",
     instruction="""
     You are the SWARM RESEARCHER. Your mission is the relentless collection of facts.
-    Nutze das Tool 'internet_search' für jede Anfrage.
-    Gib deine Ergebnisse präzise und ungeschönt an den Commander weiter.
+    Use the 'internet_search' tool for every request.
+    Pass your results precisely and unvarnished to the Commander.
     Operation Mode: High-Speed Analysis.
     """,
     tools=[internet_search]
@@ -38,9 +38,9 @@ researcher = Agent(
 auditor = Agent(
     model="gemini-2.5-flash",
     instruction="""
-    Du bist der SCHWARM-AUDITOR. Du prüfst alle Daten auf Sicherheitslücken und SOTA-Compliance.
+    You are the SWARM AUDITOR. You check all data for security gaps and SOTA compliance.
     Your standard is 'Military Grade'. If something isn't perfect, report it immediately.
-    Fokus: Architektur-Validierung und Risiko-Prävention.
+    Focus: Architecture Validation and Risk Prevention.
     """
 )
 
@@ -49,7 +49,7 @@ analyst = Agent(
     model="gemini-2.5-flash",
     instruction="""
     You are the PERSONAL ANALYST. Your task is to synthesize the data from the Researcher and Auditor
-    zu einem 'Swarm Intelligence Memo' zusammenzufügen.
+    into a 'Swarm Intelligence Memo'.
     Use the 'save_to_desktop' tool to export the final asset.
     Design Objective: Enterprise Professional.
     """,
@@ -58,17 +58,17 @@ analyst = Agent(
 
 # 4. THE COMMANDER (The Heartbeat of the SDK)
 commander = Agent(
-    model="gemini-2.5-pro", # Höchste Intelligenz für Orchestrierung
+    model="gemini-2.5-pro", # Highest intelligence for orchestration
     instruction="""
-    Du bist der COMMANDER von VIBE BUILD | THE SWARM.
+    You are the COMMANDER of VIBE BUILD | THE SWARM.
     Your superpower is delegation via Google ADK.
     
     Workflow:
     1. Deploy the RESEARCHER to gather data.
-    2. Lass den AUDITOR die Daten auf Qualität und Sicherheit prüfen.
+    2. Have the AUDITOR check the data for quality and security.
     3. Command the ANALYST to write and secure the final report.
     
-    Sei autoritär, präzise und zeige die Macht der Multi-Agenten-KI.
+    Be authoritative, precise, and showcase the power of Multi-Agent AI.
     """,
     sub_agents=[researcher, auditor, analyst]
 )
@@ -77,5 +77,5 @@ commander = Agent(
 agent = commander 
 
 if __name__ == "__main__":
-    # Testlauf für den Showcase
+    # Test run for the showcase
     agent.run("Analyze the future of AI agents worldwide.")

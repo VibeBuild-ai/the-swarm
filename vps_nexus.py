@@ -3,7 +3,7 @@ from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
-CORS(app) # Lässt dein Dashboard von GitHub Pages rein
+CORS(app) # Allows your Dashboard from GitHub Pages to access the hub
 
 @app.route('/nexus_gateway', methods=['POST'])
 def nexus_gateway():

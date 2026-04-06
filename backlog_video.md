@@ -11,7 +11,7 @@
 - [ ] `.env` Datei mit Projekt-ID und Region anlegen
 - [ ] Vertex AI API aktivieren
 
-# 🚀 Operation "Der Schwarm" - YouTube Roadmap (Enterprise Edition)
+# 🚀 Operation "The Swarm" - YouTube Roadmap (Enterprise Edition)
 
 ## 🎥 Intro Hook (0:00 - 1:00)
 - **Problem**: "KI-Agenten lokal auf dem Laptop laufen lassen ist cool, aber wer macht die Arbeit, wenn ihr schlaft?"
@@ -19,12 +19,12 @@
 - **Showcase**: Zeige das neue **ADK Swarm Control Dashboard** (index.html).
 
 ## 🛠 Teil 1: Der Code (1:00 - 5:00)
-- Zeige kurz den `Commander` in `der_schwarm/agent.py`.
-- Erkläre die Delegation: "Der Commander befehligt den Schwarm-Researcher, den Schwarm-Auditor und den Analysten."
+- Zeige kurz den `Commander` in `the_swarm/agent.py`.
+- Erkläre die Delegation: "Der Commander befehligt den Swarm Researcher, den Swarm Auditor und den Analysten."
 - **Code-Snippet**: `root_agent = Agent(sub_agents=[commander, researcher...])`
 
 ## ☁️ Teil 2: Google Cloud Go-Live (5:00 - 8:00)
-- Terminal-Befehl zeigen: `adk deploy agent_engine der_schwarm`
+- Terminal-Befehl zeigen: `adk deploy agent_engine the_swarm`
 - Point: "Pure Schwarmintelligenz in der Cloud – ohne Wartungsaufwand."
 - Zeige kurz die **Vertex AI Agent Engine Console**.
 
