@@ -569,8 +569,11 @@
                 analyst: "ANALYST: Generate a final executive summary based on the gathered intelligence data.",
                 full_swarm: "CORE DIRECTIVE: Analyze next-generation AI agents and their impact on global markets."
             };
-            input.value = prompts[key];
-            input.focus();
+            const input = document.getElementById('user-input');
+            if (input) {
+                input.value = prompts[key];
+                input.focus();
+            }
             
             // Highlight active button
             const btns = document.querySelectorAll('.preset-btn');
