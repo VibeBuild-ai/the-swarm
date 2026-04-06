@@ -197,26 +197,36 @@
         }
 
         async function getAccessToken() {
-            const header = { alg: "RS256", typ: "JWT" };
-            const now = Math.floor(Date.now() / 1000);
-            const payload = {
-                iss: auth.clientEmail,
-                scope: "https://www.googleapis.com/auth/cloud-platform",
-                aud: "https://oauth2.googleapis.com/token",
-                exp: now + 3600,
-                iat: now
-            };
-            const sHeader = JSON.stringify(header);
-            const sPayload = JSON.stringify(payload);
-            const jwt = KJUR.jws.JWS.sign("RS256", sHeader, sPayload, auth.privateKey);
+            try {
+                const header = { alg: "RS256", typ: "JWT" };
+                const now = Math.floor(Date.now() / 1000);
+                const payload = {
+                    iss: auth.clientEmail,
+                    scope: "https://www.googleapis.com/auth/cloud-platform",
+                    aud: "https://oauth2.googleapis.com/token",
+                    exp: now + 3600,
+                    iat: now
+                };
+                const sHeader = JSON.stringify(header);
+                const sPayload = JSON.stringify(payload);
+                const jwt = KJUR.jws.JWS.sign("RS256", sHeader, sPayload, auth.privateKey);
 
-            const response = await fetch("https://oauth2.googleapis.com/token", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
-            });
-            const data = await response.json();
-            return data.access_token;
+                // CROSS-ORIGIN PROXY FÜR TOKEN-EXCHANGE
+                const proxy = "https://corsproxy.io/?";
+                const tokenUrl = "https://oauth2.googleapis.com/token";
+                
+                const response = await fetch(proxy + encodeURIComponent(tokenUrl), {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
+                });
+                
+                if (!response.ok) throw new Error("Auth Server Rejection");
+                const data = await response.json();
+                return data.access_token;
+            } catch(e) {
+                throw new Error("TOKEN_GENERATION_FAILED: " + e.message);
+            }
         }
 
         async function dispatchSwarm() {
@@ -229,23 +239,29 @@
             }
 
             btn.disabled = true;
-            addLog(`NEXUS_HANDSHAKE: Generating encrypted access token...`, 'success');
+            terminal.innerHTML = '';
+            addLog(`NEXUS_HANDSHAKE: Securing encrypted authority token...`, 'success');
 
             try {
                 const token = await getAccessToken();
                 const endpoint = `https://${auth.location}-aiplatform.googleapis.com/v1/projects/${auth.projectId}/locations/${auth.location}/agents/${auth.agentId}:run`;
                 
-                addLog(`BROADCAST: Sending command to Agent Engine...`, 'success');
-                const response = await fetch(endpoint, {
+                addLog(`BROADCAST: Sending command to Vertex AI (Proxy-Mode)...`, 'success');
+                
+                const proxy = "https://corsproxy.io/?";
+                const response = await fetch(proxy + encodeURIComponent(endpoint), {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ input: { content: prompt } })
                 });
 
-                if (!response.ok) throw new Error('API Rejection: Verify Project & Region');
+                if (!response.ok) {
+                    const errorDetails = await response.text();
+                    throw new Error(`API_REJECTED: ${response.status} - ${errorDetails.substring(0, 50)}...`);
+                }
 
                 const data = await response.json();
-                lastAgentResponse = data.output?.content || 'Mission parameters received.';
+                lastAgentResponse = data.output?.content || 'Mission parameters synchronized.';
                 
                 addLog(`AGENT_OUTPUT: ${lastAgentResponse}`, 'agent');
                 const dl = `<a href="#" onclick="downloadRealAsset(); return false;" class="underline text-fuchsia-400 font-bold ml-2 uppercase">[Export Asset]</a>`;
@@ -253,6 +269,7 @@
 
             } catch(e) {
                 addLog(`CRITICAL_FAILURE: ${e.message}`, 'error');
+                if (e.message.includes('CORS')) addLog('TIPP: Nutze einen Browser ohne Tracking-Blocker für die API-Verbindung.', 'info');
             } finally {
                 btn.disabled = false;
             }
