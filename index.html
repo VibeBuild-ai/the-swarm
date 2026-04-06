@@ -239,18 +239,22 @@
         async function multiFetch(targetUrl, options) {
             const proxies = [
                 { name: "CodeTabs (Bridge 1)", url: "https://api.codetabs.com/v1/proxy?quest=" },
-                { name: "ThingProxy (Bridge 2)", url: "https://thingproxy.freeboard.io/fetch/" },
-                { name: "CorsProxy.io (Bridge 3)", url: "https://corsproxy.io/?" }
+                { name: "CORS-Anywhere (Bridge 2)", url: "https://cors-anywhere.herokuapp.com/" },
+                { name: "ThingProxy (Bridge 3)", url: "https://thingproxy.freeboard.io/fetch/" }
             ];
 
             for (const p of proxies) {
                 try {
                     addLog(`BRIDGE: Testing ${p.name}...`, 'success');
                     const controller = new AbortController();
-                    const id = setTimeout(() => controller.abort(), 8000); // 8s Fast-Fail
+                    const id = setTimeout(() => controller.abort(), 8000);
                     
-                    const fetchUrl = p.url + encodeURIComponent(targetUrl);
-                    const response = await fetch(fetchUrl, { ...options, signal: controller.signal });
+                    const fetchUrl = p.url + (p.name.includes("Anywhere") ? targetUrl : encodeURIComponent(targetUrl));
+                    const response = await fetch(fetchUrl, { 
+                        ...options, 
+                        signal: controller.signal,
+                        headers: { ...options.headers, "X-Requested-With": "XMLHttpRequest" } 
+                    });
                     clearTimeout(id);
 
                     if (response.ok) {
@@ -261,6 +265,13 @@
                             return json; 
                         } catch(e) { }
                     }
+                    
+                    if (response.status === 403 && p.name.includes("Anywhere")) {
+                        addLog(`BRIDGE: ${p.name} needs manual unlock.`, 'error');
+                        window.open("https://cors-anywhere.herokuapp.com/corsdemo", "_blank");
+                        alert("Bitte auf der neuen Seite 'Request temporary access' klicken, um die Nexus-Brücke freizuschalten!");
+                    }
+
                     addLog(`BRIDGE: ${p.name} rejected our signal.`, 'error');
                 } catch(e) { 
                     addLog(`BRIDGE: ${p.name} offline.`, 'error');
