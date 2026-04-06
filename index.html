@@ -247,7 +247,7 @@
                 try {
                     addLog(`BRIDGE: Testing ${p.name}...`, 'success');
                     const controller = new AbortController();
-                    const id = setTimeout(() => controller.abort(), 8000);
+                    const id = setTimeout(() => controller.abort(), 45000); // 45s Generative Timeout
                     
                     const fetchUrl = p.url + (p.name.includes("Anywhere") ? targetUrl : encodeURIComponent(targetUrl));
                     const response = await fetch(fetchUrl, { 
