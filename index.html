@@ -55,15 +55,6 @@
                             <div class="text-[9px] font-black text-green-500 uppercase tracking-widest mb-1 group-hover:text-green-400">Final Analyst</div>
                             <div class="text-[10px] text-slate-500">Final Synthesis</div>
                         </button>
-                        
-                        <div class="pt-4 mt-4 border-t border-white/5"></div>
-                        <button onclick="setPrompt('full_swarm')" class="preset-btn w-full text-left p-4 rounded-xl border border-red-500/30 hover:bg-red-500/10 transition-all group shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-                            <div class="text-[9px] font-black text-red-500 uppercase tracking-widest mb-1 group-hover:text-red-400 flex items-center justify-between">
-                                <span>THE SWARM</span>
-                                <span class="px-1.5 py-0.5 bg-red-500/20 rounded text-[7px]">MULTI-AGENT</span>
-                            </div>
-                            <div class="text-[10px] text-slate-500">Researcher + Auditor + Analyst</div>
-                        </button>
                     </div>
                 </div>
             </nav>
@@ -391,7 +382,10 @@
         let assetPayloads = [];
 
         async function dispatchSwarm() {
-            const inputVal = document.getElementById('user-input').value;
+            const inputEl = document.getElementById('commandInput');
+            if (!inputEl) return;
+            const inputVal = inputEl.value;
+
             if(!inputVal.trim()) return alert("Directive required.");
             if (!auth.privateKey || !auth.projectId) {
                 addLog('AUTHORITY_ERROR: Please link your Service Account JSON.', 'error');
@@ -426,71 +420,11 @@
                 const assetId = assetPayloads.length;
                 assetPayloads.push({ directive: inputVal, response: responseText });
 
-                const dl1 = `<a href="#" onclick="generatePDFAsset(${assetId}); return false;" class="underline text-red-500 font-bold ml-2 uppercase hover:text-red-400 transition-colors">[📎 EXTRACT AS ASSET]</a>`;
+                const dl1 = `<a href="#" onclick="generatePDFAsset(${assetId}); return false;" class="underline text-red-500 font-bold ml-2 uppercase hover:text-red-400 transition-colors">[📎 EXTRACT TARGET ASSET]</a>`;
                 addLog(`MISSION SUCCESS. Payload ready for extraction: ${dl1}`, 'success');
 
             } catch(e) {
                 addLog(`CRITICAL_FAILURE: ${e.message}`, 'error');
-            }
-        }
-
-        async function dispatchFullSwarm() {
-            const inputVal = document.getElementById('user-input').value;
-            const btn = document.getElementById('btn-dispatch');
-            if(!inputVal.trim()) return alert("Directive required.");
-            if (!auth.privateKey || !auth.projectId) {
-                addLog('AUTHORITY_ERROR: Please link your Service Account JSON.', 'error');
-                switchView('connector'); return;
-            }
-            
-            btn.disabled = true; // Lock button during full swarm orchestration
-            terminal.innerHTML = '';
-            
-            try {
-                const token = await getAccessToken();
-                let modelId = "gemini-2.5-flash"; 
-                const endpoint = `https://${auth.location}-aiplatform.googleapis.com/v1/projects/${auth.projectId}/locations/${auth.location}/publishers/google/models/${modelId}:generateContent`;
-                
-                const systemTemplate = "You are a high-level specialist within 'The Swarm'. Output raw, highly analytical data without pleasantries. Prioritize elite formatting.";
-                
-                addLog(`INITIATING FULL SWARM PROTOCOL (3-NODE CHAIN)...`, 'agent');
-
-                // NODE 1
-                addLog(`[NODE 1] RESEARCHER: Gathering comprehensive intelligence...`, 'agent');
-                let p1 = { "contents": [{ "role": "user", "parts": [{ "text": "Act as an elite Web Researcher. Gather deep facts on: " + inputVal }] }], "systemInstruction": { "parts": [{ "text": systemTemplate }] } };
-                let d1 = await multiFetch(endpoint, { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(p1) });
-                let res1 = d1.candidates?.[0]?.content?.parts?.[0]?.text || 'No data.';
-                addLog(`[NODE 1] RESEARCHER: Data acquired. Handing over to Auditor.`, 'success');
-                
-                await new Promise(r => setTimeout(r, 1000));
-
-                // NODE 2
-                addLog(`[NODE 2] AUDITOR: Verifying data and finding weak points...`, 'agent');
-                let p2 = { "contents": [{ "role": "user", "parts": [{ "text": "Act as a strict Logic Auditor. Review these facts and identify flaws/risks:\n\n" + res1 }] }], "systemInstruction": { "parts": [{ "text": systemTemplate }] } };
-                let d2 = await multiFetch(endpoint, { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(p2) });
-                let res2 = d2.candidates?.[0]?.content?.parts?.[0]?.text || 'No risks identified.';
-                addLog(`[NODE 2] AUDITOR: Audit complete. Handing over to Final Analyst.`, 'success');
-
-                await new Promise(r => setTimeout(r, 1000));
-
-                // NODE 3
-                addLog(`[NODE 3] ANALYST: Synthesizing final executive report...`, 'agent');
-                let p3 = { "contents": [{ "role": "user", "parts": [{ "text": "Act as Final Analyst. Read Research and Audit, then synthesize a final Executive Summary.\n\nRESEARCH:\n" + res1 + "\n\nCRITICAL AUDIT:\n" + res2 }] }], "systemInstruction": { "parts": [{ "text": systemTemplate }] } };
-                let d3 = await multiFetch(endpoint, { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(p3) });
-                let res3 = d3.candidates?.[0]?.content?.parts?.[0]?.text || 'Synthesis failed.';
-                
-                let finalRes = `>>> PHASE 1: RESEARCH INTELLIGENCE\n\n${res1}\n\n=========================================\n\n>>> PHASE 2: SECURITY & LOGIC AUDIT\n\n${res2}\n\n=========================================\n\n>>> PHASE 3: MASTER SYNTHESIS\n\n${res3}`;
-                
-                const assetId = assetPayloads.length;
-                assetPayloads.push({ directive: inputVal, response: finalRes });
-                addLog(`SWARM SYNTHESIS COMPLETE. Compiling Multi-Agent Payload...`, 'agent');
-                const dl1 = `<a href="#" onclick="generatePDFAsset(${assetId}); return false;" class="underline text-red-500 font-bold ml-2 uppercase hover:text-red-400 transition-colors">[📎 EXTRACT SWARM ASSET]</a>`;
-                addLog(`MISSION SUCCESS. Full Swarm payload ready for extraction: ${dl1}`, 'success');
-
-            } catch(e) {
-                addLog(`CRITICAL_FAILURE: ${e.message}`, 'error');
-            } finally {
-                btn.disabled = false;
             }
         }
 
@@ -550,10 +484,9 @@
             const prompts = {
                 researcher: "RESEARCHER: Scan the web for the latest AI trends for Q2 2026.",
                 auditor: "AUDITOR: Perform a comprehensive security audit on the current infrastructure.",
-                analyst: "ANALYST: Generate a final executive summary based on the gathered intelligence data.",
-                full_swarm: "CORE DIRECTIVE: Analyze next-generation AI agents and their impact on global markets."
+                analyst: "ANALYST: Generate a final executive summary based on the gathered intelligence data."
             };
-            const input = document.getElementById('user-input');
+            const input = document.getElementById('commandInput');
             if (input) {
                 input.value = prompts[key];
                 input.focus();
@@ -562,34 +495,13 @@
             // Highlight active button
             const btns = document.querySelectorAll('.preset-btn');
             btns.forEach(b => {
-                b.classList.remove('bg-blue-500/10', 'border-blue-500/30', 'bg-red-500/10', 'border-red-500/30', 'shadow-[0_0_15px_rgba(239,68,68,0.1)]');
+                b.classList.remove('bg-blue-500/10', 'border-blue-500/30');
                 b.classList.add('border-white/5');
             });
             
             const btn = event.currentTarget;
             btn.classList.remove('border-white/5');
-            
-            if(key === 'full_swarm') {
-                btn.classList.add('bg-red-500/10', 'border-red-500/30', 'shadow-[0_0_15px_rgba(239,68,68,0.1)]');
-                
-                // Rewire Dispatch Button
-                const dispatchBtn = document.getElementById('btn-dispatch');
-                if (dispatchBtn) {
-                    dispatchBtn.onclick = dispatchFullSwarm;
-                    dispatchBtn.innerText = "DEPLOY MULTI-AGENT SWARM";
-                    dispatchBtn.className = "px-6 py-3 bg-red-600 hover:bg-red-500 text-white text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]";
-                }
-            } else {
-                btn.classList.add('bg-blue-500/10', 'border-blue-500/30');
-                
-                // Reset Dispatch Button
-                const dispatchBtn = document.getElementById('btn-dispatch');
-                if (dispatchBtn) {
-                    dispatchBtn.onclick = dispatchSwarm;
-                    dispatchBtn.innerText = "DISPATCH SIGNAL";
-                    dispatchBtn.className = "px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border border-blue-500/50 shadow-[0_0_20px_rgba(37,99,235,0.2)]";
-                }
-            }
+            btn.classList.add('bg-blue-500/10', 'border-blue-500/30');
             
             switchView('dashboard');
         }
