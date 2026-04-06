@@ -566,10 +566,44 @@
             const prompts = {
                 researcher: "RESEARCHER: Scan the web for the latest AI trends for Q2 2026.",
                 auditor: "AUDITOR: Perform a comprehensive security audit on the current infrastructure.",
-                analyst: "ANALYST: Generate a final executive summary based on the gathered intelligence data."
+                analyst: "ANALYST: Generate a final executive summary based on the gathered intelligence data.",
+                full_swarm: "CORE DIRECTIVE: Analyze next-generation AI agents and their impact on global markets."
             };
             input.value = prompts[key];
             input.focus();
+            
+            // Highlight active button
+            const btns = document.querySelectorAll('.preset-btn');
+            btns.forEach(b => {
+                b.classList.remove('bg-blue-500/10', 'border-blue-500/30', 'bg-red-500/10', 'border-red-500/30', 'shadow-[0_0_15px_rgba(239,68,68,0.1)]');
+                b.classList.add('border-white/5');
+            });
+            
+            const btn = event.currentTarget;
+            btn.classList.remove('border-white/5');
+            
+            if(key === 'full_swarm') {
+                btn.classList.add('bg-red-500/10', 'border-red-500/30', 'shadow-[0_0_15px_rgba(239,68,68,0.1)]');
+                
+                // Rewire Dispatch Button
+                const dispatchBtn = document.getElementById('btn-dispatch');
+                if (dispatchBtn) {
+                    dispatchBtn.onclick = dispatchFullSwarm;
+                    dispatchBtn.innerText = "DEPLOY MULTI-AGENT SWARM";
+                    dispatchBtn.className = "px-6 py-3 bg-red-600 hover:bg-red-500 text-white text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]";
+                }
+            } else {
+                btn.classList.add('bg-blue-500/10', 'border-blue-500/30');
+                
+                // Reset Dispatch Button
+                const dispatchBtn = document.getElementById('btn-dispatch');
+                if (dispatchBtn) {
+                    dispatchBtn.onclick = dispatchSwarm;
+                    dispatchBtn.innerText = "DISPATCH SIGNAL";
+                    dispatchBtn.className = "px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border border-blue-500/50 shadow-[0_0_20px_rgba(37,99,235,0.2)]";
+                }
+            }
+            
             switchView('dashboard');
         }
     </script>
