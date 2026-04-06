@@ -336,7 +336,7 @@
                     if (e.message.includes("GOOGLE_API_ERROR") || e.message.includes("PROXY_RAW_ERROR")) throw e;
                 }
             }
-            throw new Error("ALL_BRIDGES_FAILED: Nexus currently unreachable. Request a manual CORS unlock or check your IPS.");
+            throw new Error("ALL_BRIDGES_FAILED: Nexus currently unreachable. Please go to 'Authority Bridge' and click 'Re-Authorize Public Nexus (CORS)' to unlock the gateway.");
         }
 
         async function getAccessToken() {
