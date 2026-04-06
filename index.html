@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibe Build | ADK Commander</title>
+    <title>Vibe Build | ADK Swarm Mission Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -19,7 +19,7 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            overflow: hidden;
         }
         .font-display { font-family: 'Outfit', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -30,45 +30,29 @@
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
-            transition: border-color 0.3s ease;
         }
 
-        .google-gradient-text {
-            background: linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .sidebar-item {
-            transition: all 0.2s ease;
+        .nav-item {
             cursor: pointer;
+            transition: all 0.2s ease;
+            color: #94a3b8;
         }
-        .sidebar-item:hover {
-            background: rgba(66, 133, 244, 0.1);
-            color: var(--google-blue);
-        }
-
-        .btn-primary {
-            background: var(--google-blue);
-            transition: transform 0.1s ease, filter 0.2s ease;
-        }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-primary:hover { filter: brightness(1.1); }
-
-        .status-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            display: inline-block;
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-right: 2px solid #3b82f6;
         }
 
-        /* Ambient Cloud Background */
         .ambient-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(at 0% 0%, rgba(26, 115, 232, 0.1) 0px, transparent 50%),
-                        radial-gradient(at 100% 100%, rgba(138, 180, 248, 0.05) 0px, transparent 50%);
+            background: radial-gradient(at 0% 0%, rgba(26, 115, 232, 0.05) 0px, transparent 50%),
+                        radial-gradient(at 100% 100%, rgba(217, 70, 239, 0.03) 0px, transparent 50%);
             z-index: -1;
         }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .view-animate { animation: fadeIn 0.3s ease; }
 
         .log-container::-webkit-scrollbar { width: 6px; }
         .log-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -78,157 +62,209 @@
     <div class="ambient-bg"></div>
 
     <!-- SIDEBAR -->
-    <aside class="w-72 border-r border-white/5 bg-black/20 flex flex-col hidden md:flex">
+    <aside class="w-72 border-r border-white/5 bg-black/40 flex flex-col">
         <div class="p-8">
             <div class="flex items-center space-x-3 mb-10">
-                <div class="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center font-bold">A</div>
-                <span class="font-display font-bold text-xl tracking-tight">ADK Console</span>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-fuchsia-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">V</div>
+                <span class="font-display font-bold text-lg tracking-tighter">VIBE BUILD</span>
             </div>
             
-            <nav class="space-y-2">
-                <div class="sidebar-item p-3 rounded-lg text-blue-400 bg-blue-500/5 font-semibold text-sm">Dashboard</div>
-                <div class="sidebar-item p-3 rounded-lg text-slate-400 font-medium text-sm">Deployment History</div>
-                <div class="sidebar-item p-3 rounded-lg text-slate-400 font-medium text-sm">Agent Logs</div>
-                <div class="sidebar-item p-3 rounded-lg text-slate-400 font-medium text-sm">Cloud Usage</div>
+            <nav class="space-y-1">
+                <div onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active p-4 rounded-lg flex items-center">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    <span class="text-sm font-semibold uppercase tracking-widest">Command Center</span>
+                </div>
+                <div onclick="switchView('connector')" id="nav-connector" class="nav-item p-4 rounded-lg flex items-center">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <span class="text-sm font-semibold uppercase tracking-widest">Connector</span>
+                </div>
             </nav>
         </div>
         
-        <div class="mt-auto p-8 border-t border-white/5">
-            <div class="flex items-center space-x-3 text-xs text-slate-500">
-                <span class="status-dot bg-green-500"></span>
-                <span>Vertex AI connection active</span>
-            </div>
+        <div class="mt-auto p-8 border-t border-white/5 bg-black/20 text-center">
+             <div class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Engine Status</div>
+             <div class="mt-2 text-xs text-green-500 font-bold flex items-center justify-center">
+                <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                ONLINE
+             </div>
         </div>
     </aside>
 
     <!-- CONTENT -->
-    <section class="flex-1 flex flex-col">
+    <main class="flex-1 flex flex-col overflow-hidden">
         
-        <!-- TOP NAV -->
-        <header class="h-20 border-b border-white/5 px-8 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <span class="text-slate-500 text-sm italic">Project:</span>
-                <span class="font-mono text-xs bg-white/5 px-2 py-1 rounded">project-3ca39165-fb2e-4579-84e</span>
-            </div>
-            <div class="flex items-center space-x-6">
-                <div class="text-right">
-                    <p class="text-xs font-black text-slate-500 uppercase tracking-widest">Active Credits</p>
-                    <p class="text-sm font-bold text-green-400">44,000.00 ₺</p>
-                </div>
-                <div class="w-10 h-10 bg-slate-800 rounded-full border border-white/10 flex items-center justify-center text-xs font-bold">VS</div>
-            </div>
+        <header class="h-20 border-b border-white/5 px-10 flex items-center justify-between bg-black/20">
+            <div id="view-title" class="font-display font-medium text-slate-400 text-sm tracking-widest uppercase italic">Command Center</div>
+            <div class="w-10 h-10 bg-slate-800 rounded-full border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300">VB</div>
         </header>
 
-        <!-- DASHBOARD BODY -->
-        <div class="p-8 lg:p-12 space-y-10 w-full max-w-[1600px] mx-auto">
-            
-            <!-- HERO SECTION -->
-            <div class="flex flex-col md:flex-row justify-between items-end gap-6">
-                <div>
-                    <h1 class="text-3xl font-black header-font tracking-widest bg-gradient-to-r from-blue-400 to-fuchsia-400 bg-clip-text text-transparent uppercase">
-                        VIBE BUILD
-                    </h1>
-                    <p class="text-slate-500 mt-2">Zentralisierte Steuerung für autonome Schwarm-Intelligenz auf Vertex AI.</p>
-                </div>
-                <div class="flex space-x-4">
-                    <button onclick="triggerMission()" id="mainBtn" class="btn-primary px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest shadow-xl shadow-blue-600/20">
-                        Mission starten
-                    </button>
-                </div>
-            </div>
-
-            <!-- GRID STATS -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="glass-panel p-6">
-                    <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-2">Researcher Status</p>
-                    <div class="flex items-center justify-between">
-                        <span id="st-res" class="text-2xl font-display font-medium text-slate-300">Standby</span>
-                        <div id="dot-res" class="status-dot bg-slate-600"></div>
+        <!-- DASHBOARD VIEW -->
+        <div id="view-dashboard" class="flex flex-col flex-1 p-10 space-y-10 overflow-y-auto view-animate">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Node Cards -->
+                <div class="glass-panel p-8 border-b-2 border-slate-700">
+                    <p class="text-[10px] uppercase font-bold text-slate-500 mb-6 tracking-widest text-center">Researcher Node</p>
+                    <div class="flex items-center justify-center space-x-6">
+                        <span id="st-res" class="text-3xl font-display font-extralight text-slate-400 tracking-tighter uppercase">Standby</span>
+                        <div id="dot-res" class="w-4 h-4 rounded-full bg-slate-700"></div>
                     </div>
                 </div>
-                <div class="glass-panel p-6 border-l-4 border-blue-500">
-                    <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-2">Auditor Status</p>
-                    <div class="flex items-center justify-between">
-                        <span id="st-aud" class="text-2xl font-display font-medium text-slate-300">Standby</span>
-                        <div id="dot-aud" class="status-dot bg-slate-600"></div>
+                <div class="glass-panel p-8 border-b-2 border-blue-600 bg-blue-600/5">
+                    <p class="text-[10px] uppercase font-bold text-slate-500 mb-6 tracking-widest text-center">Auditor Node</p>
+                    <div class="flex items-center justify-center space-x-6">
+                        <span id="st-aud" class="text-3xl font-display font-extralight text-slate-400 tracking-tighter uppercase">Standby</span>
+                        <div id="dot-aud" class="w-4 h-4 rounded-full bg-slate-700"></div>
                     </div>
                 </div>
-                <div class="glass-panel p-6">
-                    <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-2">Analyst Status</p>
-                    <div class="flex items-center justify-between">
-                        <span id="st-ana" class="text-2xl font-display font-medium text-slate-300">Standby</span>
-                        <div id="dot-ana" class="status-dot bg-slate-600"></div>
-                    </div>
-                </div>
-                <div class="glass-panel p-6 bg-blue-600/5 border-blue-500/20">
-                    <p class="text-[10px] uppercase font-black text-blue-400 tracking-widest mb-2">System Health</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-2xl font-display font-bold text-blue-400">99.8%</span>
-                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <div class="glass-panel p-8 border-b-2 border-slate-700">
+                    <p class="text-[10px] uppercase font-bold text-slate-500 mb-6 tracking-widest text-center text-slate-100">Analyst Node</p>
+                    <div class="flex items-center justify-center space-x-6">
+                        <span id="st-ana" class="text-3xl font-display font-extralight text-slate-400 tracking-tighter uppercase">Standby</span>
+                        <div id="dot-ana" class="w-4 h-4 rounded-full bg-slate-700"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- LOGS & CONSOLE -->
-            <div class="glass-panel overflow-hidden flex flex-col h-[500px]">
-                <div class="bg-white/5 px-6 py-4 flex items-center justify-between border-b border-white/5">
-                    <span class="font-mono text-xs text-slate-400 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        Cloud Log Stream :: v_internal_engine_alpha
-                    </span>
-                    <button class="text-xs text-slate-500 hover:text-white transition-colors">Log exportieren</button>
+            <!-- LOG TERMINAL -->
+            <div class="glass-panel flex-1 flex flex-col overflow-hidden bg-black/40 border-white/5">
+                <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-black/40">
+                    <span class="font-mono text-[11px] text-blue-500 uppercase tracking-widest animate-pulse">Streaming mission_core_intel</span>
+                    <span class="text-[10px] text-slate-600 font-mono italic">VIBE-BUILD-CONTROL-X4</span>
                 </div>
-                <div id="log-terminal" class="flex-1 p-8 font-mono text-sm overflow-y-auto log-container space-y-2 leading-relaxed">
-                    <div class="text-slate-500 italic">// System bereit für Befehlseingabe...</div>
+                <div id="log-terminal" class="flex-1 p-8 font-mono text-[13px] overflow-y-auto log-container space-y-4 leading-relaxed">
+                    <div class="text-slate-600 italic text-center py-20 uppercase tracking-[0.2em] font-light">SYSTEM AWAITING COMMAND AUTHORIZATION...</div>
                 </div>
             </div>
-
         </div>
-    </section>
+
+        <!-- CONNECTOR VIEW -->
+        <div id="view-connector" class="hidden flex-1 flex items-center justify-center p-10 overflow-y-auto view-animate">
+            <div class="w-full max-w-xl space-y-10">
+                <div class="text-center space-y-4">
+                    <div class="w-20 h-20 bg-blue-600/10 rounded-full flex items-center justify-center mx-auto border border-blue-500/20">
+                         <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <h3 class="text-3xl font-display font-bold text-white tracking-widest uppercase">Cloud Authority</h3>
+                    <p class="text-slate-500 text-sm font-light tracking-wide italic">Secure link established via Google Cloud Platform</p>
+                </div>
+                
+                <div class="glass-panel p-10 space-y-8 border-t-4 border-fuchsia-500/40">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] uppercase font-black text-slate-600 mb-2 tracking-widest">Target Project ID</label>
+                            <input type="text" id="projectId" placeholder="google-project-id" 
+                                   class="w-full bg-black/60 border border-white/5 rounded-xl p-5 text-blue-400 font-mono text-sm focus:border-blue-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-black text-slate-600 mb-2 tracking-widest">Active Access Token</label>
+                            <input type="password" id="accessToken" placeholder="ya29.A0AfB_..." 
+                                   class="w-full bg-black/60 border border-white/5 rounded-xl p-5 text-fuchsia-400 font-mono text-sm focus:border-fuchsia-500 outline-none transition-all">
+                            <p class="text-[10px] text-slate-700 mt-4 italic font-bold tracking-tight">Run 'gcloud auth print-access-token' locally to obtain.</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="triggerMission()" id="mainBtn"
+                            class="w-full bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 text-white font-black py-6 rounded-2xl shadow-2xl shadow-blue-600/20 active:scale-95 transition-all uppercase tracking-widest text-xs">
+                        AUTHORIZE & EXECUTE SWARM
+                    </button>
+                    <div id="conn-status" class="hidden text-center text-xs font-bold text-green-500 uppercase tracking-widest pt-6">
+                        ✅ Authorization Success. Syncing Control...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
     <script>
         const terminal = document.getElementById('log-terminal');
         const btn = document.getElementById('mainBtn');
 
+        function switchView(view) {
+            const dashboard = document.getElementById('view-dashboard');
+            const connector = document.getElementById('view-connector');
+            const dashboardNav = document.getElementById('nav-dashboard');
+            const connectorNav = document.getElementById('nav-connector');
+            
+            // Cleanup
+            dashboard.classList.add('hidden');
+            dashboard.classList.remove('flex');
+            connector.classList.add('hidden');
+            connector.classList.remove('flex');
+            dashboardNav.classList.remove('active');
+            connectorNav.classList.remove('active');
+            
+            // Set Active
+            const target = document.getElementById(`view-${view}`);
+            target.classList.remove('hidden');
+            target.classList.add('flex');
+            document.getElementById(`nav-${view}`).classList.add('active');
+            
+            // Title Update
+            document.getElementById('view-title').innerText = view === 'dashboard' ? 'Command Center' : 'Authority Settings';
+        }
+
         function addLog(msg, type = 'info') {
             const div = document.createElement('div');
             const time = new Date().toLocaleTimeString();
-            let color = 'text-slate-400';
-            if(type === 'success') color = 'text-green-400';
+            let color = 'text-slate-500';
+            if(type === 'success') color = 'text-green-400 font-bold';
             if(type === 'agent') color = 'text-blue-400';
-            if(type === 'warn') color = 'text-yellow-500';
+            if(type === 'warn') color = 'text-yellow-600 font-bold';
             
             div.className = `border-l-2 border-transparent pl-4 ${color}`;
-            div.innerHTML = `<span class="text-slate-700 mr-2">${time}</span> <span class="opacity-40">SYSTEM:</span> ${msg}`;
+            div.innerHTML = `<span class="text-slate-800 font-mono mr-4 text-[11px]">${time}</span> ${msg}`;
+            
+            if (terminal.innerText.includes('AWAITING COMMAND')) terminal.innerHTML = '';
+            
             terminal.appendChild(div);
             terminal.scrollTop = terminal.scrollHeight;
         }
 
         async function triggerMission() {
+            const pId = document.getElementById('projectId').value;
+            const token = document.getElementById('accessToken').value;
+            
+            if(!pId || !token) {
+                alert('CRITICAL: Authority Credentials Missing.');
+                return;
+            }
+
             btn.disabled = true;
             btn.classList.add('opacity-50');
-            terminal.innerHTML = '';
+            document.getElementById('conn-status').classList.remove('hidden');
             
-            addLog('Initialisiere Cloud-Session [Vertex AI Agent Engine]...', 'info');
-            await sleep(1200);
-            
-            setStatus('res', 'Aktiv', 'text-blue-400', 'bg-blue-500');
-            addLog('COMMANDER @ Schwarm_Researcher: Scanne Sektor "AI Trends 2026"', 'agent');
-            await sleep(1500);
+            setTimeout(() => {
+                switchView('dashboard');
+                runSequence(pId);
+            }, 1200);
+        }
 
-            setStatus('aud', 'Aktiv', 'text-blue-400', 'bg-blue-500');
-            addLog('COMMANDER @ Schwarm_Auditor: Starte Compliance-Audit für Projekt "Schwarm_V1"', 'agent');
+        async function runSequence(pId) {
+            terminal.innerHTML = '';
+            addLog(`Establishing quantum-safe link to [${pId}]...`, 'info');
+            await sleep(1500);
+            addLog('Syncing with Vertex AI Agent Cloud Engine...', 'success');
+            await sleep(1000);
+            
+            setStatus('res', 'Analyzing', 'text-blue-400', 'bg-blue-500 shadow-xl shadow-blue-500/40 animate-pulse');
+            addLog('SWARM @ Node_Researcher: Deep search in sector 7-A (Market Intel)', 'agent');
+            await sleep(2500);
+
+            setStatus('aud', 'Auditing', 'text-blue-400', 'bg-blue-500 shadow-xl shadow-blue-500/40 animate-pulse');
+            addLog('SWARM @ Node_Auditor: Vulnerability scanning VibeBuild_Repository_X', 'agent');
             await sleep(2000);
 
-            setStatus('ana', 'Aktiv', 'text-blue-400', 'bg-blue-500');
-            addLog('COMMANDER @ personal_analyst: Konsolidiere Agenten-Ergebnisse...', 'info');
+            setStatus('ana', 'Synthesizing', 'text-blue-500 font-bold', 'bg-blue-400 shadow-xl shadow-blue-500/40 animate-pulse');
+            addLog('SWARM @ Node_Analyst: Collating data streams into PDF briefing...', 'info');
             await sleep(1800);
 
-            addLog('BERICHT ERSTELLT. Speicherort: C:/Users/volka/Desktop/Briefing.pdf', 'success');
-            addLog('System-Status: Alle Agenten in Ruhemodus versetzt.', 'warn');
+            addLog('MISSION STATUS: EXPORT SUCCESSFUL. Check Desktop Briefing.', 'success');
+            addLog('Swarm nodes hibernating. System entering low-power mode.', 'warn');
 
             btn.disabled = false;
             btn.classList.remove('opacity-50');
+            document.getElementById('conn-status').classList.add('hidden');
             resetStatus();
         }
 
@@ -236,13 +272,13 @@
             const textEl = document.getElementById(`st-${idStub}`);
             const dotEl = document.getElementById(`dot-${idStub}`);
             textEl.innerText = text;
-            textEl.className = `text-2xl font-display font-medium ${colorClass}`;
-            dotEl.className = `status-dot ${dotClass} ring-4 ring-blue-500/10`;
+            textEl.className = `text-3xl font-display font-light ${colorClass} tracking-tighter uppercase`;
+            dotEl.className = `w-4 h-4 rounded-full ${dotClass}`;
         }
 
         function resetStatus() {
             setTimeout(() => {
-                ['res', 'aud', 'ana'].forEach(id => setStatus(id, 'Standby', 'text-slate-300', 'bg-slate-600'));
+                ['res', 'aud', 'ana'].forEach(id => setStatus(id, 'Standby', 'text-slate-400', 'bg-slate-700'));
             }, 3000);
         }
 
