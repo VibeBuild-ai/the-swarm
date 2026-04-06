@@ -62,7 +62,7 @@
         <div class="mt-auto p-8 border-t border-white/5 bg-black/20">
              <div class="text-[10px] text-slate-600 uppercase font-black tracking-widest mb-1">Nexus Status</div>
              <div id="engine-status" class="text-xs font-mono text-red-500 uppercase">Disconnected</div>
-             <div class="text-[7px] text-slate-800 uppercase mt-4 tracking-widest opacity-50">v2.0.5 - Hyper-Speed Flash</div>
+             <div class="text-[7px] text-slate-800 uppercase mt-4 tracking-widest opacity-50">v2.0.6 - CORS Edge</div>
         </div>
     </aside>
 
@@ -238,9 +238,9 @@
 
         async function multiFetch(targetUrl, options) {
             const proxies = [
-                { name: "CodeTabs (Bridge 1)", url: "https://api.codetabs.com/v1/proxy?quest=" },
-                { name: "CORS-Anywhere (Bridge 2)", url: "https://cors-anywhere.herokuapp.com/" },
-                { name: "ThingProxy (Bridge 3)", url: "https://thingproxy.freeboard.io/fetch/" }
+                { name: "CorsProxy.io (Premium Edge)", url: "https://corsproxy.io/?" },
+                { name: "AllOrigins (Global Net)", url: "https://api.allorigins.win/raw?url=" },
+                { name: "CORS-Anywhere (Legacy)", url: "https://cors-anywhere.herokuapp.com/" }
             ];
 
             for (const p of proxies) {
@@ -249,7 +249,7 @@
                     const controller = new AbortController();
                     const id = setTimeout(() => controller.abort(), 45000); // 45s Generative Timeout
                     
-                    const fetchUrl = p.url + (p.name.includes("Anywhere") ? targetUrl : encodeURIComponent(targetUrl));
+                    const fetchUrl = p.url + (p.name.includes("Legacy") ? targetUrl : encodeURIComponent(targetUrl));
                     const response = await fetch(fetchUrl, { 
                         ...options, 
                         signal: controller.signal,
