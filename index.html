@@ -106,19 +106,26 @@
                 </div>
                 <div class="space-y-6">
                     <div>
-                        <textarea id="jsonInput" placeholder="Paste Service Account JSON content here..." 
-                                  class="w-full h-56 bg-black/60 border border-white/5 rounded-2xl p-6 text-blue-400 font-mono text-[10px] focus:border-blue-500 outline-none transition-all resize-none shadow-inner"></textarea>
+                        <label class="block text-[9px] uppercase font-bold text-slate-600 mb-3 tracking-widest">Authority Nexus (Service Account JSON)</label>
+                        <textarea id="jsonInput" placeholder="Paste full Service Account JSON content here..." 
+                                  class="w-full h-64 bg-black/60 border border-white/5 rounded-2xl p-6 text-blue-400 font-mono text-[10px] focus:border-blue-500 outline-none transition-all resize-none shadow-inner"></textarea>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="text" id="location" value="us-central1" class="w-full bg-black/40 border border-white/5 rounded-xl p-4 text-[10px] font-mono text-slate-500 outline-none">
-                        <input type="text" id="agentId" placeholder="Agent ID (e.g. der_schwarm)" class="w-full bg-black/60 border border-white/5 rounded-xl p-4 text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none">
+                        <div class="flex flex-col space-y-2">
+                             <label class="text-[8px] uppercase text-slate-700 font-bold ml-1">Cloud Region</label>
+                             <input type="text" id="location" value="us-central1" class="w-full bg-black/60 border border-white/5 rounded-xl p-4 text-[10px] font-mono text-slate-400 focus:border-blue-500 outline-none transition-all">
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                             <label class="text-[8px] uppercase text-slate-700 font-bold ml-1">Agent ID</label>
+                             <input type="text" id="agentId" placeholder="e.g. der_schwarm" class="w-full bg-black/60 border border-white/5 rounded-xl p-4 text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none transition-all">
+                        </div>
                     </div>
                     
                     <button onclick="saveConnectorData()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
                         ACTIVATE AUTHORITY
                     </button>
-                    <p class="text-[8px] text-slate-700 text-center uppercase tracking-widest">Pure local crypto. Your keys never leave this browser.</p>
+                    <p class="text-[8px] text-slate-700 text-center uppercase tracking-widest">RSA-256 Auth Active. Zero data leaves your browser context.</p>
                 </div>
             </div>
         </div>
