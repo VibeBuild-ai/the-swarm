@@ -351,9 +351,9 @@
             try {
                 const token = await getAccessToken();
                 
-                // Wir mappen 'the_swarm' auf Gemini 1.5 Pro, da Vertex AI kein natives '/agents' REST hat
-                let modelId = auth.agentId === "the_swarm" ? "gemini-1.5-pro-001" : auth.agentId;
-                if (!modelId.includes("gemini")) modelId = "gemini-1.5-pro-001"; // Fallback Safenet
+                // We map 'the_swarm' to Gemini 2.5 Pro since Vertex doesn't have a native /agents REST API
+                let modelId = auth.agentId === "the_swarm" || auth.agentId === "der_schwarm" ? "gemini-2.5-pro" : auth.agentId;
+                if (!modelId.includes("gemini")) modelId = "gemini-2.5-pro"; // Fallback Safenet
 
                 const endpoint = `https://${auth.location}-aiplatform.googleapis.com/v1/projects/${auth.projectId}/locations/${auth.location}/publishers/google/models/${modelId}:generateContent`;
                 

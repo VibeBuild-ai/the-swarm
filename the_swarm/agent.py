@@ -24,7 +24,7 @@ def internet_search(query: str) -> str:
 
 # 1. THE RESEARCHER (Analytical Spearhead)
 researcher = Agent(
-    model="gemini-1.5-flash",
+    model="gemini-2.5-flash",
     instruction="""
     You are the SWARM RESEARCHER. Your mission is the relentless collection of facts.
     Nutze das Tool 'internet_search' für jede Anfrage.
@@ -36,7 +36,7 @@ researcher = Agent(
 
 # 2. THE AUDITOR (Security & Compliance Guard)
 auditor = Agent(
-    model="gemini-1.5-flash",
+    model="gemini-2.5-flash",
     instruction="""
     Du bist der SCHWARM-AUDITOR. Du prüfst alle Daten auf Sicherheitslücken und SOTA-Compliance.
     Your standard is 'Military Grade'. If something isn't perfect, report it immediately.
@@ -46,7 +46,7 @@ auditor = Agent(
 
 # 3. THE ANALYST (Synthesis & Export)
 analyst = Agent(
-    model="gemini-1.5-flash",
+    model="gemini-2.5-flash",
     instruction="""
     You are the PERSONAL ANALYST. Your task is to synthesize the data from the Researcher and Auditor
     zu einem 'Swarm Intelligence Memo' zusammenzufügen.
@@ -58,7 +58,7 @@ analyst = Agent(
 
 # 4. THE COMMANDER (The Heartbeat of the SDK)
 commander = Agent(
-    model="gemini-1.5-pro", # Höchste Intelligenz für Orchestrierung
+    model="gemini-2.5-pro", # Höchste Intelligenz für Orchestrierung
     instruction="""
     Du bist der COMMANDER von VIBE BUILD | THE SWARM.
     Your superpower is delegation via Google ADK.
